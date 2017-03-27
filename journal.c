@@ -36,7 +36,13 @@ void initialiseJournal(journal *jDeBord){
     jDeBord->nbLigne=0;
 }
 
-int creerjournal(journal *p){
+/*
+* On ouvre le journal et on récupère toutes les données à l'intérieur.
+* Si le journal ne contient aucune donnée alors on retourne 0 sinon on récupère les données
+* et on renvoie 1
+*/
+
+int ouvertureJournal(journal *p){
     FILE* fichsave;
     fichsave=fopen("journal.bin", "r+b");
     if (fichsave==NULL){
@@ -46,13 +52,25 @@ int creerjournal(journal *p){
     fread(&p->nbLigne, sizeof(int), 1, fichsave);
     if(&p->nbLigne==0){
         printf("Il n'y a aucune ligne dans le fichier. Redirection au menu\n");
-        sleep(1);
+        sleep(2);
         return 0;
     }
-    
+    fread(&p->intitule, p->nbLigne * sizeof(char [20]), 1, fichsave);
+    fread(&p->nomEntreprise, p->nbLigne * sizeof(char [20]), 1, fichsave);
+    fread(&p->siteTrouve, p->nbLigne * sizeof(char [20]), 1, fichsave);
+    fread(&p->contact, p->nbLigne * sizeof(char [20]), 1, fichsave);
+    fread(&p->dateEnvoie, p->nbLigne * sizeof(char [20]), 1, fichsave);
+    fread(&p->reponse, sizeof(char [20]), 1, fichsave);
     fclose(fichsave);
     return 1;
 }
+
+/*
+* Cette fonction permettra de saisir l'intitulé du dossier de candidature
+* L'utilisateur va saisir 1 si c'est une réponse à une offre de stage 
+* Et 2 si c'est une candidature spontanée, On retourne 1 pour offre de stage
+* et 2 pour une candidature spontanée
+*/
 
 int saisieIntitule(char **typeOffre){
     int type;
@@ -62,27 +80,18 @@ int saisieIntitule(char **typeOffre){
     }while (type==1 || type==2);
     return type;
 }
+
 /**
 int sauvegardeOffre (char[20] intitule, char[20] nomEntreprise, char[20] nomSite, char[20] dateEnvoie){
 
 }
 **/
+
+
 void creationOffre(journal *p){
-    char intitule[20];
-    char nomEntreprise[20];
-    char nomSite[20];
-    char dateEnvoi[20];
     char check, sur;
     printf("Saisissez l'intitulé de l'offre :\n");
     scanf("%s", intitule);
-    printf("Est-vous sur de l'intitulé?[O/n] \n%s", intitule);
-    scanf("%c", &check);
-    if (check=='o' || check=='O' || check=='n' || check=='N'){
-        if(check=='n' || check=='N'){
-            printf("Saisissez l'intitulé de l'offre :\n");
-            scanf("%s", intitule);
-        }            
-    }
     printf("Saisissez le nom de l'entreprise :\n");
     scanf("%s", nomEntreprise);
     printf("Saisissez le nom du site ou vous avez trouvé l'offre :\n");
@@ -104,7 +113,7 @@ void libereMemoire(journal *p){
     free(p->intitule);
     free(p->nomEntreprise);
     free(p->siteTrouve);
-    free(p->nomRh);
+    free(p->contact);
     free(p->dateEnvoie);
     free(p->reponse);
 }
@@ -116,7 +125,7 @@ int main(void){
     typeOffre[0]="Offre";
     typeOffre[1]="Spontanée";
     int type;
-    creerjournal(&jDeBord);
+    ouvertureJournal(&jDeBord);
     if (saisieIntitule(typeOffre)==1){
         creationOffre(&jDeBord);
     }
