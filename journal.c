@@ -75,7 +75,6 @@ int ouvertureJournal(journal *p){
         printf("Impossible d'atteindre le journal.\n");
         return 0;
     }
-    printf("test");
     fread(&p->nbLigne, sizeof(int), 1, fichsave);
     if(&p->nbLigne==0){
         printf("Il n'y a aucune ligne dans le fichier. Redirection au menu\n");
@@ -90,7 +89,6 @@ int ouvertureJournal(journal *p){
     fread(&p->reponse, sizeof(char [21]), 1, fichsave);
     fread(&p->type, p->nbLigne * sizeof(int), 1, fichsave);
     fclose(fichsave);
-    printf("test");
     return 1;
 }
 
@@ -106,13 +104,13 @@ int sauvegardeOffre (journal *p){
         return 0;
     }
     fwrite(&p->nbLigne, sizeof(int), 1, fichsave);
-    fwrite(&p->intitule, p->nbLigne * sizeof(char [21]), 1, fichsave);
-    fwrite(&p->nomEntreprise, p->nbLigne * sizeof(char [21]), 1, fichsave);
-    fwrite(&p->siteTrouve, p->nbLigne * sizeof(char [21]), 1, fichsave);
-    fwrite(&p->contact, p->nbLigne * sizeof(char [21]), 1, fichsave);
-    fwrite(&p->dateEnvoie, p->nbLigne * sizeof(char [21]), 1, fichsave);
-    fwrite(&p->reponse, sizeof(char [21]), 1, fichsave);
-    fwrite(&p->type, p->nbLigne * sizeof(int), 1, fichsave);
+    fwrite(&p->intitule, sizeof(char [21]), p->nbLigne, fichsave);
+    fwrite(&p->nomEntreprise, sizeof(char [21]), p->nbLigne, fichsave);
+    fwrite(&p->siteTrouve, sizeof(char [21]), p->nbLigne, fichsave);
+    fwrite(&p->contact, sizeof(char [21]), p->nbLigne, fichsave);
+    fwrite(&p->dateEnvoie, sizeof(char [21]), p->nbLigne, fichsave);
+    fwrite(&p->reponse, sizeof(char [21]), p->nbLigne, fichsave);
+    fwrite(&p->type, sizeof(int), p->nbLigne, fichsave);
     fclose(fichsave);
     return 1;
 }
