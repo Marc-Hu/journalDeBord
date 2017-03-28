@@ -1,10 +1,10 @@
 all: run
 
 run: clearMain compile
-	./mainFinal
+	./journal
 
 compile:
-	gcc mainFinal.c -Wall -o mainFinal
+	gcc journal.c -Wall -o journal
 
 clearMain:
-	rm -rf mainFinal
+	rm -rf journal

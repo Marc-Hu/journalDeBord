@@ -70,7 +70,7 @@ void libereMemoire(journal *p){
 
 int ouvertureJournal(journal *p){
     FILE* fichsave;
-    fichsave=fopen("journal.bin", "r+b");
+    fichsave=fopen("journal.bin", "w+b");
     if (fichsave==NULL){
         printf("Impossible d'atteindre le journal.\n");
         return 0;
@@ -148,12 +148,15 @@ void reallocation(journal *jDeBord){
 */
 
 int creationOffre(journal *p, int type){
-    char sur;
+    char test;
     clear_terminal();
+    p->type[p->nbLigne]=type;
     printf("=====> Saisie de la candidature avec des cases de 20 mots maximum\nSaisissez l'intitulé de la candidature :\n");
     scanf("%s", p->intitule[p->nbLigne]);
     printf("Saisissez le nom de l'entreprise :\n");
     scanf("%s", p->nomEntreprise[p->nbLigne]);
+    printf("%d\n", p->nbLigne);
+    printf("%s\n", p->nomEntreprise[p->nbLigne]);
     if (type==1){
         printf("Saisissez le nom du site ou vous avez trouvé l'offre :\n");
         scanf("%s", p->siteTrouve[p->nbLigne]);
@@ -165,20 +168,23 @@ int creationOffre(journal *p, int type){
     printf("Saisissez la date d'envoie du dossier de candidature (exemple : 1 janv 2017) :\n");
     scanf("%s", p->dateEnvoie[p->nbLigne]);
     printf("Etes-vous sûr de la saisie de votre offre?[O/n] (Vous pourrez la supprimer ultérieurement)\n");
-    scanf("%c", &sur);
-    if (sur=='n' || sur=='N'){
-        printf("Voulez-vous quitter?[O/n]");
-        scanf("%c", &sur);
-        if (sur=='n' || sur=='N')
+    scanf("%c", &test);
+    test=getchar();
+    if (test=='n' || test=='N'){
+        printf("Voulez-vous quitter?[O/n]\n");
+        scanf("%c", &test);
+        test=getchar();
+        if (test=='n' || test=='N')
             creationOffre(p, type);
         return 0;
     }
     p->nbLigne++;
     reallocation(p);
-    printf("Voulez-vous saisir une autre offre?[O/n]");
-    if (sur=='o' || sur=='O')
+    printf("Voulez-vous saisir une autre offre?[O/n]\n");
+    scanf("%c", &test);
+    test=getchar();
+    if (test=='o' || test=='O')
         creationOffre(p, type);
-    sauvegardeOffre(p);
     return 1;
 }
 
@@ -194,6 +200,7 @@ void affichage(journal *p){
         printf("%s\t%s\t%s\t%s\t%s\t%d\n",p->intitule[i], p->nomEntreprise[i], p->siteTrouve[i], p->contact[i], p->dateEnvoie[i], p->type[i]);
     printf("Nombre de candidature : %d\nRetour menu principal?[O/n]", (p->nbLigne));
     scanf("%c", &quit);
+    quit=getchar();
     while(quit!='O' && quit!='o'){
         printf("Retour menu principal?[O/n]");
         scanf("%c", &quit);
@@ -381,6 +388,7 @@ int journalD(journal *p){
             case 3:
                 break;
             case 4:
+                printf("vous avez taper : %s", p->intitule[0]);
                 affichage(p);
                 break;
             case 5:
@@ -388,6 +396,7 @@ int journalD(journal *p){
             case 6:
                 break;
             case 7:
+                sauvegardeOffre(p);
                 libereMemoire(p);
                 return 0;
                 break;
@@ -396,7 +405,17 @@ int journalD(journal *p){
     return 1;
 }
 
+void viderBuffer()
+{
+    int c = 0;
+    while (c != '\n' && c != EOF)
+    {
+        c = getchar();
+    }
+}
+
 int main(void){
+    viderBuffer();
     journal jDeBord;
     journalD(&jDeBord);
     return 0;
